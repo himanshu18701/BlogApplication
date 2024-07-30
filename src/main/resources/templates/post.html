@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Post</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/blog.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top">
+    <a class="navbar-brand" th:href="@{/posts}">Blog</a>
+</nav>
+<div class="container">
+    <h1 th:text="${post.title}"></h1>
+    <p th:text="${post.content}"></p>
+    <a class="btn btn-success mb-3" th:href="@{/posts}">Back to Posts</a>
+    <br><br>
+    <a class="btn btn-warning mb-3" th:if="${role=='[ROLE_ADMIN]' || authorId==userId}"
+       th:href="@{/posts/updatePost(postId=${post.id})}">Update</a>
+    <a class="btn btn-danger mb-3" th:if="${role=='[ROLE_ADMIN]' || authorId==userId}"
+       th:href="@{/posts/deletePost(postId=${post.id})}">Delete</a>
+
+    <div class="comment-section">
+        <h3>Comments</h3>
+        <ul class="list-group">
+            <li class="list-group-item comment" th:each="comment:${post.comments}">
+                <p>
+                    <strong th:text="${comment.name}">Name</strong>
+                    <span th:text="${comment.email}">Email</span>
+                </p>
+                <p th:text="${comment.comment}">Comment Text</p>
+                <a class="btn btn-danger btn-sm" th:if="${role=='[ROLE_ADMIN]' || authorId==userId}"
+                   th:href="@{/comments/delete(postId=${post.id},commentId=${comment.id})}">Delete</a>
+                <a class="btn btn-secondary btn-sm" th:if="${role=='[ROLE_ADMIN]' || authorId==userId}"
+                   th:href="@{/comments/update(postId=${post.id},commentId=${comment.id})}">Edit</a>
+            </li>
+        </ul>
+
+        <h3 class="mt-4">Add Comments</h3>
+        <form th:action="@{/comments/add(postId=${post.id})}" th:object="${comment}" method="POST">
+            <div class="form-group">
+                <input type="hidden" th:value="${post.id}" name="postId"/>
+                <input type="text" class="form-control" th:field="*{name}" placeholder="Your Name" required/>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" th:field="*{email}" placeholder="Your Email" required/>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" th:field="*{comment}" placeholder="Your Comment" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Add Comment</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
